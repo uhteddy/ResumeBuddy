@@ -13,4 +13,5 @@
 </script>
 
 <p>test</p>
+<a href="/welcome">Go to welcome</a>
 <h1>{result}</h1>
