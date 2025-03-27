@@ -12,13 +12,13 @@ In a competitive job market, everyone deserves access to tools that help them st
 
 | Operating System | Download Link | Notes |
 |------------------|---------------|-------|
-| Windows | [.exe installer](https://github.com/uhteddy/ResumeBuddy/releases/latest/download/Resume.Buddy_0.1.0_x64-setup.exe) | Unsigned - may trigger Windows SmartScreen warnings |
-| Windows (MSI) | [MSI installer](https://github.com/uhteddy/ResumeBuddy/releases/latest/download/Resume.Buddy_0.1.0_x64_en-US.msi) | Unsigned - may trigger security warnings |
-| macOS (Intel) | [DMG installer](https://github.com/uhteddy/ResumeBuddy/releases/latest/download/Resume.Buddy_0.1.0_x64.dmg) | Unsigned - will require right-click to open |
-| macOS (Apple Silicon) | [DMG installer](https://github.com/uhteddy/ResumeBuddy/releases/latest/download/Resume.Buddy_0.1.0_aarch64.dmg) | Unsigned - will require right-click to open |
-| Linux (Debian/Ubuntu) | [.deb package](https://github.com/uhteddy/ResumeBuddy/releases/latest/download/Resume.Buddy_0.1.0_amd64.deb) | |
-| Linux (Fedora/RHEL) | [.rpm package](https://github.com/uhteddy/ResumeBuddy/releases/latest/download/Resume.Buddy-0.1.0-1.x86_64.rpm) | |
-| Linux (AppImage) | [AppImage](https://github.com/uhteddy/ResumeBuddy/releases/latest/download/Resume.Buddy_0.1.0_amd64.AppImage) | Make executable with `chmod +x` |
+| Windows | [.exe installer](https://github.com/uhteddy/ResumeBuddy/releases/latest/download/Resume.Buddy_0.1.1_x64-setup.exe) | Unsigned - may trigger Windows SmartScreen warnings |
+| Windows (MSI) | [MSI installer](https://github.com/uhteddy/ResumeBuddy/releases/latest/download/Resume.Buddy_0.1.1_x64_en-US.msi) | Unsigned - may trigger security warnings |
+| macOS (Intel) | [DMG installer](https://github.com/uhteddy/ResumeBuddy/releases/latest/download/Resume.Buddy_0.1.1_x64.dmg) | Unsigned - will require right-click to open |
+| macOS (Apple Silicon) | [DMG installer](https://github.com/uhteddy/ResumeBuddy/releases/latest/download/Resume.Buddy_0.1.1_aarch64.dmg) | Unsigned - will require right-click to open |
+| Linux (Debian/Ubuntu) | [.deb package](https://github.com/uhteddy/ResumeBuddy/releases/latest/download/Resume.Buddy_0.1.1_amd64.deb) | |
+| Linux (Fedora/RHEL) | [.rpm package](https://github.com/uhteddy/ResumeBuddy/releases/latest/download/Resume.Buddy-0.1.1-1.x86_64.rpm) | |
+| Linux (AppImage) | [AppImage](https://github.com/uhteddy/ResumeBuddy/releases/latest/download/Resume.Buddy_0.1.1_amd64.AppImage) | Make executable with `chmod +x` |
 
 > **Security Notice**: These applications are not signed by Apple or Microsoft due to the high cost of developer certificates. You may see security warnings when installing. Follow your OS's instructions to bypass these warnings if you trust this application.
 
