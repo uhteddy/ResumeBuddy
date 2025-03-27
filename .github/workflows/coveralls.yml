@@ -1,0 +1,10 @@
+name: 'Coveralls test'
+
+on: [push]
+
+jobs:
+  coveralls:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Coveralls GitHub Action
+        uses: coverallsapp/github-action@v2.3.6
