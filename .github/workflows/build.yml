@@ -80,6 +80,9 @@ jobs:
         run: |
           pnpm install
 
+      - name: Add RLS component
+        run: rustup component add rls
+
       - name: CI Build
         if: ${{ github.ref_type == 'branch' }}
         run: |
