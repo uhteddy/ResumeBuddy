@@ -5,7 +5,9 @@
     let { children } = $props();
 </script>
 
-<TitleBar />
-<main>
-    {@render children()}
+<main class="h-screen w-screen flex flex-col rounded-lg overflow-hidden">
+    <TitleBar />
+    <div class="h-full w-full bg-gray-50">
+        {@render children()}
+    </div>
 </main>
