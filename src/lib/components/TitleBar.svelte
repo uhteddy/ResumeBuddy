@@ -26,8 +26,8 @@
 
 <div 
     data-tauri-drag-region 
-    class="titlebar w-screen h-10 bg-gradient-to-r from-white to-gray-50 border-b border-yellow-500/10
-    shadow-sm flex items-center justify-between px-4 mb-[1px]"
+    class="titlebar w-screen h-10 bg-gradient-to-r from-white to-gray-50 border-b border-neutral-200
+    shadow-sm flex items-center justify-between px-4"
     onmousedown={startDragging}
     role="button"
 >
