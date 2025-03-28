@@ -1,6 +1,6 @@
 <script lang="ts">
-    import BlurFade from "../../lib/components/BlurFade.svelte";
-    import { fade, fly } from 'svelte/transition';
+    import BlurFade from "../../../lib/components/BlurFade.svelte";
+    import { fade, fly, scale } from 'svelte/transition';
     import { spring } from 'svelte/motion';
     import { goto } from "$app/navigation";
     
@@ -8,6 +8,8 @@
     let inputEl;
     let showArrow = false;
     let containerEl;
+    let isTransitioning = false;
+    let showGreeting = false;
     
     // Spring animation for the arrow bounce effect
     const arrowBounce = spring({ x: 0 }, {
@@ -37,17 +39,31 @@
         }
     }
     
+    function startTransition() {
+        if (userName.trim()) {
+            isTransitioning = true;
+            
+            // Show greeting message after overlay appears
+            setTimeout(() => {
+                showGreeting = true;
+                
+                // Navigate after greeting shows
+                setTimeout(() => {
+                    goto('/on-boarding/2');
+                }, 2000);
+            }, 600);
+        }
+    }
+    
     function handleKeydown(event: KeyboardEvent) {
         if (event.key === 'Enter' && userName.trim()) {
-            console.log('Name submitted:', userName);
-            // goto('/next-step');
+            startTransition();
         }
     }
 
     function handleSubmit() {
         if (userName.trim()) {
-            console.log('Name submitted:', userName);
-            // goto('/next-step');
+            startTransition();
         }
     }
 </script>
@@ -126,6 +142,24 @@
             </div>
         </BlurFade>
     </div>
+    
+    <!-- Transition overlay -->
+    {#if isTransitioning}
+        <div 
+            class="fixed rounded-md overflow-hidden inset-0 bg-yellow-500 bg-opacity-90 z-50 flex items-center justify-center"
+            in:fade={{ duration: 400 }}
+        >
+            {#if showGreeting}
+                <div 
+                    in:scale={{ duration: 400, start: 0.8 }}
+                    class="text-white text-center"
+                >
+                    <h2 class="text-4xl font-bold mb-2">Nice to meet you, {userName}!</h2>
+                    <p class="text-x">Let's get started...</p>
+                </div>
+            {/if}
+        </div>
+    {/if}
 </div>
 
 <style>
