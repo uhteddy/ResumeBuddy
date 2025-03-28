@@ -91,7 +91,7 @@
     
     <!-- Bottom input section - fixed at bottom -->
     <div class="w-full max-w-md mb-16 mt-auto">
-        <BlurFade delay={0.25 * 10}>
+        <BlurFade delay={0.25 * 7}>
             <!-- Container with dynamic class based on state -->
             <div 
                 bind:this={containerEl}
