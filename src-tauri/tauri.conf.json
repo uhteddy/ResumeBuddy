@@ -26,10 +26,10 @@
     "windows": [
       {
         "title": "Resume Buddy",
-        "width": 800,
-        "height": 600,
-        "minWidth": 400,
-        "minHeight": 300,
+        "width": 900,
+        "height": 700,
+        "minWidth": 800,
+        "minHeight": 600,
         "resizable": true,
         "fullscreen": false,
         "decorations": false,
