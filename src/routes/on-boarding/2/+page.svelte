@@ -136,7 +136,7 @@
     <div class="w-full max-w-md mb-16 mt-5">
         <BlurFade delay={0.25 * 6}>
             <PrimaryButton 
-                on:click={handleSubmit}
+                onclick={handleSubmit}
                 fullWidth={true}
                 pulseEffect={true}
             >
@@ -146,7 +146,7 @@
     </div>
 
     <!-- Privacy banner -->
-    <div class="fixed rounded-b-md bottom-0 left-0 right-0 w-full py-2 bg-white border-t border-neutral-200 text-center z-50">
+    <div class="fixed rounded-b-md bottom-0 left-0 right-0 w-full py-2 bg-white border-t border-neutral-200 text-center z-50 border-b border-r border-l">
         <div class="flex items-center justify-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-yellow-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>

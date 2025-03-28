@@ -1,10 +1,11 @@
-<script lang="ts">
+<script lang="ts">    
     let {
         type = 'button' as 'button' | 'submit' | 'reset',
         disabled = false,
         fullWidth = false,
         showArrow = true,
         pulseEffect = false,
+        onclick,
         children
     } = $props();
 </script>
@@ -12,6 +13,7 @@
 <button 
     {type}
     {disabled}
+    onclick={onclick}
     class="relative group bg-gradient-to-r from-yellow-500 to-amber-500 
            hover:from-yellow-400 hover:to-amber-400 text-white font-medium 
            py-3 px-4 rounded-lg transition-all duration-200 
