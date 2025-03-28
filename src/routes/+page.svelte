@@ -4,11 +4,15 @@
 
   let result: string = $state('');
 
-  onMount(async () => {
-    const db = await Database.load('sqlite:resume.db');
-    db.select('SELECT * FROM projects WHERE id = ?', [1]).then((res) => {
-      console.log(res)
-    });
+  let database: Database;
+  $effect(() => {
+    Database.load('sqlite:resume.db')
+    .then(db => {
+      database = db;
+      db.select('SELECT * FROM profiles WHERE id = ?', [1]).then((res) => {
+        console.log(res)
+      });
+    })
   })
 </script>
 

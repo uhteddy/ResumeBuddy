@@ -87,12 +87,12 @@
     <div class="flex-1 w-full max-w-md flex flex-col justify-center items-center text-center pt-8">
         <BlurFade delay={0.25}>
             <h2 class="text-3xl font-bold tracking-tighter text-gray-800 sm:text-4xl">
-                Almost there!
+                Almost Resume Ready! 🚀
             </h2>
         </BlurFade>
         <BlurFade delay={0.25 * 2}>
             <p class="text-lg text-gray-700 mt-3 mb-8">
-                Help us personalize your experience by sharing a little more information.
+                We just need a few more details before you can generate your resume.
             </p>
         </BlurFade>
         

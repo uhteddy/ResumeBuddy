@@ -1,15 +1,17 @@
 <script lang="ts">
+    import Database from '@tauri-apps/plugin-sql';
     import BlurFade from "../../../lib/components/BlurFade.svelte";
     import { fade, fly, scale } from 'svelte/transition';
     import { spring } from 'svelte/motion';
     import { goto } from "$app/navigation";
     
-    let userName = "";
+    let userName = $state("");
     let inputEl;
-    let showArrow = false;
+    let showArrow = $state(false);
     let containerEl;
-    let isTransitioning = false;
-    let showGreeting = false;
+    let isTransitioning = $state(false);
+    let showGreeting = $state(false);
+    let database: Database | undefined;
     
     // Spring animation for the arrow bounce effect
     const arrowBounce = spring({ x: 0 }, {
@@ -18,7 +20,7 @@
     });
     
     // Monitor user input to show arrow and trigger animations
-    $: {
+    $effect(() => {
         const hasName = userName.trim().length > 0;
         
         if (hasName && !showArrow) {
@@ -37,7 +39,7 @@
             // Name was cleared, hide arrow
             showArrow = false;
         }
-    }
+    });
     
     function startTransition() {
         if (userName.trim()) {
@@ -57,6 +59,9 @@
     
     function handleKeydown(event: KeyboardEvent) {
         if (event.key === 'Enter' && userName.trim()) {
+            if (database != undefined) {
+                database.execute('UPDATE profiles SET name = ? WHERE id = ?', [userName, 1]);
+            }
             startTransition();
         }
     }
@@ -66,6 +71,13 @@
             startTransition();
         }
     }
+
+    $effect(() => {
+        Database.load('sqlite:resume.db')
+        .then(db => {
+            database = db;
+        })
+    });
 </script>
 
 <!-- Full screen container -->
