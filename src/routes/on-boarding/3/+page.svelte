@@ -8,6 +8,7 @@
     import FormContainer from '$lib/components/forms/FormContainer.svelte';
     import LoadingOverlay from '$lib/components/layout/LoadingOverlay.svelte';
     import { markStepComplete } from '$lib/stores/onboarding';
+    import { toast } from '@tauri-apps/api/dialog';
 
     let ollamaUrl = $state('http://localhost:11434');
     let selectedModel = $state('');
@@ -40,9 +41,11 @@
                 selectedModel = availableModels[0];
             }
             
+            toast.success('Successfully connected to Ollama instance');
             return true;
         } catch (error) {
             connectionError = error instanceof Error ? error.message : 'Failed to connect to Ollama instance';
+            toast.error(connectionError);
             return false;
         } finally {
             isTestingConnection = false;
@@ -75,9 +78,12 @@
             
             // Navigate to the app
             await goto('/app');
+            
+            toast.success('Successfully saved Ollama configuration');
         } catch (error) {
             console.error('Error saving Ollama configuration:', error);
             isTransitioning = false;
+            toast.error('Failed to save Ollama configuration');
         }
     }
 

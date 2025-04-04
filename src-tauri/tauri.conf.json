@@ -52,6 +52,9 @@
             "core:window:allow-minimize",
             "core:window:allow-unmaximize",
             "core:window:allow-unminimize",
+            "core:window:allow-is-maximized",
+            "core:window:allow-is-minimized",
+            "core:window:allow-is-fullscreen",
             "sql:default",
             "sql:allow-execute"
           ]

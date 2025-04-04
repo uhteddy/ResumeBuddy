@@ -16,6 +16,11 @@
             name: 'Profile', 
             href: '/app/profile', 
             icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' 
+        },
+        { 
+            name: 'Ollama', 
+            href: '/app/ollama', 
+            icon: 'M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' 
         }
     ];
 </script>
@@ -23,12 +28,12 @@
 <div class="flex h-screen bg-white">
     <!-- Sidebar -->
     <div
-        class="fixed left-0 top-8 h-[calc(100vh-2rem)] bg-white border-r border-gray-200 transition-all duration-300 ease-in-out {isSidebarOpen ? 'w-64' : 'w-12'}"
+        class="fixed left-0 top-8 h-[calc(100vh-2rem)] bg-white border-r border-gray-200 transition-all duration-300 ease-in-out {isSidebarOpen ? 'w-64' : 'w-12'} overflow-hidden"
         style="transform: translateX({isSidebarOpen ? '0' : '-100%'});"
     >
-        <div class="h-full flex flex-col">
+        <div class="h-full flex flex-col overflow-hidden">
             <!-- Navigation -->
-            <nav class="flex-1 py-4">
+            <nav class="flex-1 py-4 overflow-hidden">
                 {#each navigation as item}
                     <a
                         href={item.href}
@@ -46,7 +51,7 @@
 
             <!-- User Profile -->
             {#if isSidebarOpen}
-                <div class="p-4 border-t border-gray-200">
+                <div class="p-4 border-t border-gray-200 overflow-hidden">
                     <div class="flex items-center">
                         <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
                             <span class="text-gray-600 text-sm font-medium">
@@ -65,8 +70,8 @@
 
     <!-- Toggle Button -->
     <button
-        class="fixed top-12 left-0 w-8 h-8 flex items-center justify-center bg-white border-l border-r border-gray-200 shadow-sm transition-all duration-300 ease-in-out {isSidebarOpen ? 'left-64' : 'left-0'} rounded-r-md"
-        on:click={() => (isSidebarOpen = !isSidebarOpen)}
+        class="fixed top-12 left-0 w-8 h-8 flex items-center justify-center bg-white border-l border-r border-gray-200 shadow-sm transition-all duration-300 ease-in-out {isSidebarOpen ? 'left-64' : 'left-0'} rounded-r-md overflow-hidden"
+        onclick={() => (isSidebarOpen = !isSidebarOpen)}
         aria-label={isSidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
     >
         <svg
@@ -82,8 +87,8 @@
 
     <!-- Main Content -->
     <main class="flex-1 overflow-auto transition-all duration-300 ease-in-out {isSidebarOpen ? 'ml-64' : 'ml-0'}">
-        <div class="p-6">
-            <slot />
+        <div class="p-6 overflow-hidden">
+            {@render children()}
         </div>
     </main>
 </div> 

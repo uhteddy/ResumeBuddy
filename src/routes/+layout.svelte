@@ -7,6 +7,7 @@
     import { validateOnboardingSteps, onboardingSteps } from '$lib/stores/onboarding';
     import '../app.css';
     import TitleBar from '$lib/components/TitleBar.svelte';
+    import ToastContainer from '$lib/components/ToastContainer.svelte';
     let { children } = $props();
 
     onMount(async () => {
@@ -37,9 +38,10 @@
     });
 </script>
 
-<div class="h-screen flex flex-col bg-transparent">
+<div class="h-screen flex flex-col bg-white">
     <TitleBar />
-    <div class="flex-1 overflow-hidden rounded-b-lg bg-white overflow-clip">
-        {@render children()}
+    <div class="flex-1 overflow-hidden">
+        <slot />
     </div>
+    <ToastContainer />
 </div>

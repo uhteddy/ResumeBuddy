@@ -7,13 +7,26 @@
     let {
         id,
         label,
-        value = '',
+        value = $bindable(),
         placeholder = '',
         type = 'text',
         isValid = true,
         errorMessage = '',
-        optional = false
-    } = $props();
+        optional = false,
+        help = '',
+        class: className = ''
+    } = $props<{
+        id?: string;
+        label: string;
+        value?: string;
+        placeholder?: string;
+        type?: string;
+        isValid?: boolean;
+        errorMessage?: string;
+        optional?: boolean;
+        help?: string;
+        class?: string;
+    }>();
     
     function handleInput(e: Event) {
         const target = e.target as HTMLInputElement;
@@ -25,7 +38,7 @@
     }
 </script>
 
-<div class="form-group">
+<div class="space-y-1 {className}">
     <label for={id} class="block text-sm font-medium text-left text-gray-700 mb-1">
         {label} {#if optional}<span class="text-gray-400">(optional)</span>{/if}
     </label>
@@ -42,6 +55,9 @@
                  focus:ring-2 focus:ring-yellow-400/30 outline-none transition-all"
         />
     </div>
+    {#if help}
+        <p class="text-sm text-gray-500">{help}</p>
+    {/if}
     {#if !isValid && errorMessage}
         <p class="mt-1 text-sm text-red-500 text-left" transition:fade>
             {errorMessage}
