@@ -39,17 +39,19 @@ pub fn get_migrations() -> Vec<tauri_plugin_sql::Migration> {
         },
         tauri_plugin_sql::Migration {
             version: 3,
-            description: "Add default user",
+            description: "Add specialty column to profiles",
             kind: tauri_plugin_sql::MigrationKind::Up,
             sql: r#"
-                INSERT INTO profiles (
-                    name, email
-                ) 
-                VALUES (
-                    'Default User', 
-                    'user@example.com'
-                )
-                ON CONFLICT(id) DO NOTHING;
+                ALTER TABLE profiles ADD COLUMN specialty TEXT;
+            "#,
+        },
+        tauri_plugin_sql::Migration {
+            version: 4,
+            description: "Add Ollama configuration columns to profiles",
+            kind: tauri_plugin_sql::MigrationKind::Up,
+            sql: r#"
+                ALTER TABLE profiles ADD COLUMN ollama_url TEXT;
+                ALTER TABLE profiles ADD COLUMN ollama_model TEXT;
             "#,
         }
     ];
