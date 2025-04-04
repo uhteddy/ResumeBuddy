@@ -53,6 +53,22 @@ pub fn get_migrations() -> Vec<tauri_plugin_sql::Migration> {
                 ALTER TABLE profiles ADD COLUMN ollama_url TEXT;
                 ALTER TABLE profiles ADD COLUMN ollama_model TEXT;
             "#,
+        },
+        tauri_plugin_sql::Migration {
+            version: 5,
+            description: "Add table for resumes",
+            kind: tauri_plugin_sql::MigrationKind::Up,
+            sql: r#"
+                CREATE TABLE IF NOT EXISTS resumes (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    title TEXT NOT NULL,
+                    content TEXT NOT NULL,
+                    profile_id INTEGER NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (profile_id) REFERENCES profiles(id) ON DELETE CASCADE
+                );
+            "#,
         }
     ];
 }

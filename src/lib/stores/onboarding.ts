@@ -1,22 +1,13 @@
 import { writable } from 'svelte/store';
-import Database from '@tauri-apps/plugin-sql';
-
-interface Profile {
-    id: number;
-    name?: string;
-    email?: string;
-    phone?: string;
-    specialty?: string;
-    ollama_url?: string;
-    ollama_model?: string;
-}
+import { getProfile } from '$lib/database/user';
+import type { Profile } from '$lib/database/types';
 
 export interface OnboardingStep {
     id: string;
     title: string;
     description: string;
     route: string;
-    validate: (db: Database) => Promise<boolean>;
+    validate: () => Promise<boolean>;
     isRequired: boolean;
 }
 
@@ -42,9 +33,9 @@ export const onboardingSteps: OnboardingStep[] = [
         title: 'Your Name',
         description: 'Let\'s get to know each other, what\'s your name?',
         route: '/on-boarding/1',
-        validate: async (db) => {
-            const result = await db.select<Profile[]>('SELECT name FROM profiles WHERE id = ?', [1]);
-            return result.length > 0 && result[0].name != null && result[0].name.trim() !== '';
+        validate: async () => {
+            const profile = await getProfile();
+            return profile != null && profile.name.trim() !== '';
         },
         isRequired: true
     },
@@ -53,15 +44,12 @@ export const onboardingSteps: OnboardingStep[] = [
         title: 'Contact Information',
         description: 'We just need a few more details before you can generate your resume.',
         route: '/on-boarding/2',
-        validate: async (db) => {
-            const result = await db.select<Profile[]>('SELECT email, phone, specialty FROM profiles WHERE id = ?', [1]);
-            return result.length > 0 && 
-                   result[0].email != null && 
-                   result[0].email.trim() !== '' &&
-                   result[0].phone != null &&
-                   result[0].phone.trim() !== '' &&
-                   result[0].specialty != null &&
-                   result[0].specialty.trim() !== '';
+        validate: async () => {
+            const profile = await getProfile();
+            return profile != null && 
+                   profile.email.trim() !== '' &&
+                   profile.phone.trim() !== '' &&
+                   profile.specialty.trim() !== '';
         },
         isRequired: false
     },
@@ -70,13 +58,11 @@ export const onboardingSteps: OnboardingStep[] = [
         title: 'Ollama Configuration',
         description: 'Configure your Ollama instance for AI-powered resume generation.',
         route: '/on-boarding/3',
-        validate: async (db) => {
-            const result = await db.select<Profile[]>('SELECT ollama_url, ollama_model FROM profiles WHERE id = ?', [1]);
-            return result.length > 0 && 
-                   result[0].ollama_url != null && 
-                   result[0].ollama_url.trim() !== '' &&
-                   result[0].ollama_model != null &&
-                   result[0].ollama_model.trim() !== '';
+        validate: async () => {
+            const profile = await getProfile();
+            return profile != null && 
+                   profile.ollama_url.trim() !== '' &&
+                   profile.ollama_model.trim() !== '';
         },
         isRequired: true
     }
@@ -84,7 +70,6 @@ export const onboardingSteps: OnboardingStep[] = [
 
 // Function to validate all steps and update the store
 export async function validateOnboardingSteps() {
-    const db = await Database.load('sqlite:resume.db');
     const completedSteps = new Set<string>();
     let firstIncompleteStep: string | null = null;
 
@@ -107,7 +92,7 @@ export async function validateOnboardingSteps() {
             continue;
         }
 
-        const isValid = await step.validate(db);
+        const isValid = await step.validate();
         if (isValid) {
             completedSteps.add(step.id);
         } else if (!firstIncompleteStep && step.isRequired) {
@@ -129,8 +114,6 @@ export async function validateOnboardingSteps() {
 
 // Function to get the next incomplete step
 export async function getNextIncompleteStep() {
-    const db = await Database.load('sqlite:resume.db');
-    
     // Get the current path from the URL
     const currentPath = window.location.pathname;
     const currentStep = onboardingSteps.find(step => step.route === currentPath);
@@ -138,7 +121,7 @@ export async function getNextIncompleteStep() {
     if (!currentStep) {
         // If we can't find the current step, start from the beginning
         for (const step of onboardingSteps) {
-            const isValid = await step.validate(db);
+            const isValid = await step.validate();
             if (!isValid) {
                 return step;
             }
@@ -152,7 +135,7 @@ export async function getNextIncompleteStep() {
     // Start checking from the next step
     for (let i = currentIndex + 1; i < onboardingSteps.length; i++) {
         const step = onboardingSteps[i];
-        const isValid = await step.validate(db);
+        const isValid = await step.validate();
         if (!isValid) {
             return step;
         }

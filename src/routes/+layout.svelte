@@ -1,14 +1,15 @@
 <script lang="ts">
+    import { page } from '$app/stores';
+    import { fade } from 'svelte/transition';
+    import { loadAppData } from '$lib/stores/app';
     import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
     import { validateOnboardingSteps, onboardingSteps } from '$lib/stores/onboarding';
-    import Database from '@tauri-apps/plugin-sql';
     import '../app.css';
     import TitleBar from '$lib/components/TitleBar.svelte';
     let { children } = $props();
 
     onMount(async () => {
-        const db = await Database.load('sqlite:resume.db');
         const { firstIncompleteStep, isComplete } = await validateOnboardingSteps();
         
         // Get the current path
@@ -28,12 +29,17 @@
             goto('/app');
             return;
         }
+
+        // Load app data if we're not in onboarding
+        if (!currentPath.startsWith('/on-boarding')) {
+            await loadAppData();
+        }
     });
 </script>
 
-<main class="h-screen w-screen flex flex-col rounded-lg overflow-hidden border border-neutral-300 shadow-md">
+<div class="h-screen flex flex-col bg-transparent">
     <TitleBar />
-    <div class="h-full w-full bg-gray-50 rounded-b-lg">
+    <div class="flex-1 overflow-hidden rounded-b-lg bg-white overflow-clip">
         {@render children()}
     </div>
-</main>
+</div>

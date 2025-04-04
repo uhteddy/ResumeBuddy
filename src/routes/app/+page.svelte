@@ -1,140 +1,95 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
-    import Database from '@tauri-apps/plugin-sql';
     import { fade } from 'svelte/transition';
+    import { profile, resumes, isLoading } from '$lib/stores/app';
 
-    interface Profile {
-        id: number;
-        name: string;
-        email: string;
-        phone: string;
-        specialty: string;
-        ollama_url: string;
-        ollama_model: string;
-        created_at: string;
-        updated_at: string;
+    // In your component:
+    console.log($profile);
+
+    function handleCreateNewResume() {
+        // TODO: Implement resume creation flow
+        console.log('Create new resume clicked');
     }
-
-    let profile = $state<Profile | null>(null);
-    let isLoading = $state(true);
-    let error = $state<string | null>(null);
-    let database: Database;
-
-    onMount(async () => {
-        try {
-            console.log('Attempting to connect to database...');
-            database = new Database('sqlite:resume.db');
-            console.log('Database connection established');
-
-            // First, check if the profiles table exists
-            console.log('Checking if profiles table exists...');
-            const tableExists = await database.select<{ name: string }[]>(
-                "SELECT name FROM sqlite_master WHERE type='table' AND name='profiles'"
-            );
-            console.log('Table check result:', tableExists);
-            
-            if (tableExists.length === 0) {
-                error = "Profiles table does not exist. Please complete the onboarding process first.";
-                return;
-            }
-
-            // Get the most recent profile
-            console.log('Fetching most recent profile...');
-            const result = await database.select<Profile[]>(
-                'SELECT * FROM profiles ORDER BY created_at DESC LIMIT 1'
-            );
-            console.log('Profile fetch result:', result);
-            
-            if (result.length > 0) {
-                profile = result[0];
-                console.log('Profile loaded successfully:', profile);
-            } else {
-                error = "No profile found. Please complete the onboarding process first.";
-            }
-        } catch (err) {
-            console.error('Error loading profile:', err);
-            error = `Failed to load profile: ${err instanceof Error ? err.message : 'Unknown error'}`;
-        } finally {
-            isLoading = false;
-        }
-    });
 </script>
 
-<div class="w-full max-w-2xl mx-auto p-6" in:fade={{ duration: 300 }}>
-    <div class="bg-white rounded-2xl shadow-sm p-6">
-        <h1 class="text-2xl font-bold text-gray-900 mb-6">Profile Information</h1>
-        
-        {#if isLoading}
-            <div class="flex justify-center py-8">
-                <div class="animate-spin rounded-full h-8 w-8 border-4 border-yellow-500 border-t-transparent"></div>
-            </div>
-        {:else if error}
-            <div class="text-center py-8">
-                <p class="text-red-500">{error}</p>
-                <a href="/on-boarding/1" class="mt-4 inline-block text-yellow-600 hover:text-yellow-700">
-                    Go to Onboarding
-                </a>
-            </div>
-        {:else if profile}
-            <div class="space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="space-y-1">
-                        <h2 class="text-sm font-medium text-gray-500">Name</h2>
-                        <p class="text-lg text-gray-900">{profile.name}</p>
-                    </div>
-                    
-                    <div class="space-y-1">
-                        <h2 class="text-sm font-medium text-gray-500">Email</h2>
-                        <p class="text-lg text-gray-900">{profile.email}</p>
-                    </div>
-                    
-                    <div class="space-y-1">
-                        <h2 class="text-sm font-medium text-gray-500">Phone</h2>
-                        <p class="text-lg text-gray-900">{profile.phone}</p>
-                    </div>
-                    
-                    <div class="space-y-1">
-                        <h2 class="text-sm font-medium text-gray-500">Specialty</h2>
-                        <p class="text-lg text-gray-900">{profile.specialty}</p>
-                    </div>
+<div class="h-full p-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-2xl font-bold text-gray-900">
+                Hello, {$profile?.name || 'there'}!
+            </h1>
+            <p class="mt-1 text-sm text-gray-500">
+                {#if $resumes.length === 0}
+                    Ready to create your first resume?
+                {:else}
+                    You have {$resumes.length} resume{$resumes.length === 1 ? '' : 's'}
+                {/if}
+            </p>
+        </div>
+
+        <!-- Create Resume Button -->
+        <div class="mb-8">
+            <button 
+                on:click={handleCreateNewResume}
+                class="flex items-center px-4 py-2 text-sm font-medium text-white bg-yellow-600 rounded-md hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
+            >
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Create New Resume
+            </button>
+        </div>
+
+        <!-- Resumes List -->
+        <div class="space-y-4">
+            {#if $isLoading}
+                <div class="flex justify-center py-8">
+                    <div class="animate-spin rounded-full h-8 w-8 border-4 border-yellow-500 border-t-transparent"></div>
                 </div>
-                
-                <div class="border-t border-gray-200 pt-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Ollama Configuration</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="space-y-1">
-                            <h2 class="text-sm font-medium text-gray-500">Ollama URL</h2>
-                            <p class="text-lg text-gray-900">{profile.ollama_url}</p>
-                        </div>
-                        
-                        <div class="space-y-1">
-                            <h2 class="text-sm font-medium text-gray-500">Selected Model</h2>
-                            <p class="text-lg text-gray-900">{profile.ollama_model}</p>
-                        </div>
+            {:else if $resumes.length === 0}
+                <div class="text-center py-12 bg-white rounded-lg border border-gray-200">
+                    <div class="mb-4">
+                        <svg class="w-16 h-16 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
                     </div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">No Resumes Yet</h3>
+                    <p class="text-gray-500">Click the button above to create your first resume</p>
                 </div>
-                
-                <div class="border-t border-gray-200 pt-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="space-y-1">
-                            <h2 class="text-sm font-medium text-gray-500">Created At</h2>
-                            <p class="text-lg text-gray-900">{new Date(profile.created_at).toLocaleString()}</p>
+            {:else}
+                <div class="grid gap-4 sm:grid-cols-2">
+                    {#each $resumes as resume (resume.id)}
+                        <div class="bg-white rounded-lg border border-gray-200 p-6 hover:border-yellow-500 transition-colors duration-200">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-lg font-medium text-gray-900">{resume.title}</h3>
+                                    <p class="text-sm text-gray-500 mt-1">
+                                        Created {new Date(resume.created_at).toLocaleDateString()}
+                                    </p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <button 
+                                        class="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100"
+                                        aria-label="Edit resume"
+                                    >
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                        </svg>
+                                    </button>
+                                    <button 
+                                        class="p-2 text-gray-400 hover:text-red-600 rounded-full hover:bg-gray-100"
+                                        aria-label="Delete resume"
+                                    >
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                        
-                        <div class="space-y-1">
-                            <h2 class="text-sm font-medium text-gray-500">Last Updated</h2>
-                            <p class="text-lg text-gray-900">{new Date(profile.updated_at).toLocaleString()}</p>
-                        </div>
-                    </div>
+                    {/each}
                 </div>
-            </div>
-        {:else}
-            <div class="text-center py-8">
-                <p class="text-gray-500">No profile information found.</p>
-                <a href="/on-boarding/1" class="mt-4 inline-block text-yellow-600 hover:text-yellow-700">
-                    Go to Onboarding
-                </a>
-            </div>
-        {/if}
+            {/if}
+        </div>
     </div>
 </div>
