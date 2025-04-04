@@ -1,155 +1,117 @@
 <script lang="ts">
-    import { fade } from 'svelte/transition';
+    import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
-    import Database from '@tauri-apps/plugin-sql';
-    import Input from '$lib/components/forms/Input.svelte';
-    import Select from '$lib/components/forms/Select.svelte';
-    import PrimaryButton from '$lib/components/PrimaryButton.svelte';
-    import FormContainer from '$lib/components/forms/FormContainer.svelte';
+    import { ollamaSettings, updateOllamaSettings } from '$lib/stores/settings';
+    import { toast } from '$lib/stores/toast';
+    import InputField from '$lib/components/InputField.svelte';
+    import Select from '$lib/components/Select.svelte';
+    import Button from '$lib/components/Button.svelte';
     import LoadingOverlay from '$lib/components/layout/LoadingOverlay.svelte';
     import { markStepComplete } from '$lib/stores/onboarding';
-    import { toast } from '@tauri-apps/api/dialog';
 
-    let ollamaUrl = $state('http://localhost:11434');
-    let selectedModel = $state('');
+    let settings = $derived($ollamaSettings);
+    let isTesting = $state(false);
     let availableModels = $state<string[]>([]);
-    let isTestingConnection = $state(false);
-    let isTransitioning = $state(false);
-    let connectionError = $state<string | null>(null);
-    let database: Database;
+    let selectedModel = $state(settings.defaultModel);
+    let isSaving = $state(false);
 
-    async function testOllamaConnection() {
-        isTestingConnection = true;
-        connectionError = null;
-        
+    onMount(async () => {
         try {
-            // Test the connection
-            const response = await fetch(`${ollamaUrl}/api/tags`);
-            if (!response.ok) {
-                throw new Error('Failed to connect to Ollama instance');
+            const response = await fetch(`${settings.baseUrl}/api/tags`);
+            if (response.ok) {
+                const data = await response.json();
+                availableModels = data.models.map((model: any) => model.name);
+                if (availableModels.length > 0 && !selectedModel) {
+                    selectedModel = availableModels[0];
+                    settings.defaultModel = selectedModel;
+                }
             }
-            
-            const data = await response.json();
-            availableModels = data.models.map((model: any) => model.name);
-            
-            if (availableModels.length === 0) {
-                throw new Error('No models found in Ollama instance');
-            }
-            
-            // Auto-select the first model if none is selected
-            if (!selectedModel && availableModels.length > 0) {
-                selectedModel = availableModels[0];
-            }
-            
-            toast.success('Successfully connected to Ollama instance');
-            return true;
         } catch (error) {
-            connectionError = error instanceof Error ? error.message : 'Failed to connect to Ollama instance';
-            toast.error(connectionError);
-            return false;
-        } finally {
-            isTestingConnection = false;
+            console.error('Failed to fetch models:', error);
         }
-    }
-
-    async function handleSubmit() {
-        if (!ollamaUrl.trim() || !selectedModel.trim()) return;
-        
-        isTransitioning = true;
-        try {
-            // Test the connection first
-            const isValid = await testOllamaConnection();
-            if (!isValid) {
-                isTransitioning = false;
-                return;
-            }
-            
-            // Update the profile with ID 1
-            await database.execute(
-                'UPDATE profiles SET ollama_url = ?, ollama_model = ? WHERE id = ?',
-                [ollamaUrl.trim(), selectedModel.trim(), 1]
-            );
-            
-            // Mark this step as complete
-            markStepComplete('ollama');
-            
-            // Wait for the loading animation
-            await new Promise(resolve => setTimeout(resolve, 500));
-            
-            // Navigate to the app
-            await goto('/app');
-            
-            toast.success('Successfully saved Ollama configuration');
-        } catch (error) {
-            console.error('Error saving Ollama configuration:', error);
-            isTransitioning = false;
-            toast.error('Failed to save Ollama configuration');
-        }
-    }
-
-    function handleKeydown(event: KeyboardEvent) {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            handleSubmit();
-        }
-    }
-
-    $effect(() => {
-        database = new Database('sqlite:resume.db');
     });
+
+    async function testConnection() {
+        isTesting = true;
+        try {
+            const response = await fetch(`${settings.baseUrl}/api/tags`);
+            if (response.ok) {
+                const data = await response.json();
+                availableModels = data.models.map((model: any) => model.name);
+                if (availableModels.length > 0 && !selectedModel) {
+                    selectedModel = availableModels[0];
+                    settings.defaultModel = selectedModel;
+                }
+                toast.success('Successfully connected to Ollama!');
+            } else {
+                toast.error('Failed to connect to Ollama. Please check your settings.');
+            }
+        } catch (error) {
+            toast.error('Failed to connect to Ollama. Please check your settings.');
+        } finally {
+            isTesting = false;
+        }
+    }
+
+    async function handleSave() {
+        isSaving = true;
+        try {
+            settings.defaultModel = selectedModel;
+            await updateOllamaSettings(settings);
+            toast.success('Settings saved successfully!');
+            markStepComplete('ollama');
+            await goto('/app');
+        } catch (error) {
+            toast.error('Failed to save settings. Please try again.');
+        } finally {
+            isSaving = false;
+        }
+    }
 </script>
 
-<div class="w-full max-w-md" in:fade={{ duration: 300 }}>
-    <FormContainer title="Ollama Configuration" subtitle="Configure your Ollama instance for AI-powered resume generation.">
-        <div class="space-y-4">
-            <Input
-                value={ollamaUrl}
-                type="url"
-                label="Ollama URL"
-                placeholder="http://localhost:11434"
-                onInput={(e) => ollamaUrl = e}
-                onKeydown={(e) => handleKeydown(e)}
-            />
-            
-            <Select
-                value={selectedModel}
-                label="Available Models"
-                options={availableModels.map(model => ({ value: model, label: model }))}
-                disabled={availableModels.length === 0}
-                onChange={(value) => selectedModel = value}
-            />
-            
-            {#if connectionError}
-                <p class="text-sm text-red-500">{connectionError}</p>
-            {/if}
-            
-            <div class="flex gap-2">
-                <PrimaryButton
-                    disabled={!ollamaUrl.trim()}
-                    onclick={testOllamaConnection}
-                    fullWidth={true}
-                    type="button"
-                >
-                    {#if isTestingConnection}
-                        Testing Connection...
-                    {:else}
-                        Test Connection
-                    {/if}
-                </PrimaryButton>
-                
-                <PrimaryButton
-                    disabled={!ollamaUrl.trim() || !selectedModel.trim() || isTestingConnection}
-                    onclick={handleSubmit}
-                    fullWidth={true}
-                    type="button"
-                >
-                    Continue
-                </PrimaryButton>
-            </div>
+<div class="p-8">
+    <h1 class="text-2xl font-semibold text-gray-900 mb-6">Ollama Settings</h1>
+    
+    <div class="space-y-6 max-w-2xl">
+        <InputField
+            label="Base URL"
+            bind:value={settings.baseUrl}
+            help="The URL where your Ollama server is running"
+            placeholder="http://localhost:11434"
+        />
+
+        <Select
+            label="Default Model"
+            bind:value={selectedModel}
+            options={availableModels.map(model => ({ value: model, label: model }))}
+            help="The default model to use for generating content"
+        />
+
+        <div class="flex items-center space-x-4">
+            <Button
+                on:click={testConnection}
+                disabled={isTesting}
+            >
+                {#if isTesting}
+                    Testing...
+                {:else}
+                    Test Connection
+                {/if}
+            </Button>
+            <Button
+                on:click={handleSave}
+                disabled={isSaving}
+            >
+                {#if isSaving}
+                    Saving...
+                {:else}
+                    Save Settings
+                {/if}
+            </Button>
         </div>
-    </FormContainer>
+    </div>
 </div>
 
-{#if isTransitioning}
-    <LoadingOverlay isTransitioning={isTransitioning} />
+{#if isTesting || isSaving}
+    <LoadingOverlay isTransitioning={isTesting || isSaving} />
 {/if} 

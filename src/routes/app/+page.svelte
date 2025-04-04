@@ -1,6 +1,11 @@
 <script lang="ts">
     import { fade } from 'svelte/transition';
-    import { profile, resumes, isLoading } from '$lib/stores/app';
+    import { profile, resumes, isLoading, loadAppData } from '$lib/stores/app';
+    import { onMount } from 'svelte';
+
+    onMount(async () => {
+        await loadAppData();
+    });
 
     // In your component:
     console.log($profile);

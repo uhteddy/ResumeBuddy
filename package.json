@@ -10,6 +10,7 @@
     "rls": "dotenv-load tauri build",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "mac:devdeldb": "rm ~/Library/Application\\ Support/com.resumebuddy.app/resume.db",
     "tauri": "tauri"
   },
   "license": "MIT",

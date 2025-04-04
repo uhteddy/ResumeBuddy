@@ -146,10 +146,10 @@ export async function getNextIncompleteStep() {
 }
 
 // Function to mark a step as complete
-export function markStepComplete(stepId: string) {
+export function markStepComplete(stepId: string | number) {
     onboardingStore.update(state => {
         const completedSteps = new Set(state.completedSteps);
-        completedSteps.add(stepId);
+        completedSteps.add(stepId.toString());
         
         // Check if all required steps are complete
         const isComplete = onboardingSteps.every(step => !step.isRequired || completedSteps.has(step.id));
