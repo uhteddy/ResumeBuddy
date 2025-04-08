@@ -1,4 +1,5 @@
 # Resume Buddy
+> This has become a mess for me personally where I've begun to discover new technologies that will be better-fit for this application. Therefore this branch is only here for a reference but will be discarded for any actual release version.
 
 A free, open-source resume builder for Computer Science students and professionals.
 

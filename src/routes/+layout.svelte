@@ -1,47 +1,31 @@
 <script lang="ts">
-    import { page } from '$app/stores';
-    import { fade } from 'svelte/transition';
-    import { loadAppData } from '$lib/stores/app';
     import { onMount } from 'svelte';
-    import { goto } from '$app/navigation';
-    import { validateOnboardingSteps, onboardingSteps } from '$lib/stores/onboarding';
-    import '../app.css';
+    import { validateOnboardingSteps, markStepComplete } from '$lib/stores/onboarding';
+    import { loadAppData } from '$lib/stores/app';
+    import { page } from '$app/stores';
     import TitleBar from '$lib/components/TitleBar.svelte';
     import ToastContainer from '$lib/components/ToastContainer.svelte';
+    import { goto } from '$app/navigation';
+    import '../app.css';
+
     let { children } = $props();
 
     onMount(async () => {
-        const { firstIncompleteStep, isComplete } = await validateOnboardingSteps();
-        
-        // Get the current path
-        const currentPath = window.location.pathname;
-        
-        // If we're not in the onboarding flow and there are incomplete required steps
-        if (!currentPath.startsWith('/on-boarding') && firstIncompleteStep) {
-            const targetStep = onboardingSteps.find(step => step.id === firstIncompleteStep);
-            if (targetStep) {
-                goto(targetStep.route);
-                return;
-            }
-        }
-        
-        // If we're in the onboarding flow and all required steps are complete
-        if (currentPath.startsWith('/on-boarding') && isComplete) {
-            goto('/app');
-            return;
-        }
-
-        // Load app data if we're not in onboarding
-        if (!currentPath.startsWith('/on-boarding')) {
+        const isOnboarding = $page.url.pathname.startsWith('/on-boarding');
+        if (!isOnboarding) {
+            await validateOnboardingSteps();
             await loadAppData();
         }
     });
 </script>
 
-<div class="h-screen flex flex-col bg-white">
-    <TitleBar />
-    <div class="flex-1 overflow-hidden">
-        <slot />
+<div class="h-screen flex flex-col">
+    <div class="absolute inset-0 bg-gradient-to-b from-white to-gray-50 opacity-50 pointer-events-none rounded-lg"></div>
+    <div class="flex-1 flex flex-col border border-gray-200 rounded-lg shadow-xl overflow-hidden relative">
+        <TitleBar />
+        <div class="flex-1 overflow-hidden">
+            {@render children()}
+        </div>
+        <ToastContainer />
     </div>
-    <ToastContainer />
 </div>
